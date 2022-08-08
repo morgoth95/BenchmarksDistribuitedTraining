@@ -81,6 +81,7 @@ def train_model(max_epochs: int, lr: float, batch_size: int, test_batch_size: in
     time_per_epoch = []
     for epoch in range(max_epochs):
         print(f"Running epoch {epoch + 1}/{max_epochs}")
+        model.train()
         st = time.time()
         for data in tqdm(train_dl):
             loss = model(**data)
@@ -92,6 +93,7 @@ def train_model(max_epochs: int, lr: float, batch_size: int, test_batch_size: in
 
         test_loss = 0
         print(f"Running test for epoch {epoch + 1}/{max_epochs}")
+        model.eval()
         for test_data in tqdm(test_dl):
             with torch.no_grad():
                 loss = model(**test_data)
