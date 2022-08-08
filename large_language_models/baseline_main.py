@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 def change_working_directory():
     here = Path(__file__).parent
-    working_dir = here / "gpt-2-Pytorch"
+    working_dir = here / "gpt-2-Pytorch/GPT2"
     os.chdir(working_dir)
 
 
@@ -30,8 +30,8 @@ def load_tokenized_dataset():
 
 def build_model():
     change_working_directory()
-    from GPT2.config import GPT2Config
-    from GPT2.model import GPT2LMHeadModel
+    from config import GPT2Config
+    from model import GPT2LMHeadModel
 
     config = GPT2Config()
     model = GPT2LMHeadModel(config)
