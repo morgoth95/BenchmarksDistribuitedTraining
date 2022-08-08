@@ -123,5 +123,5 @@ if __name__ == "__main__":
         torch.distributed.barrier()
 
     result_dict = train_model(args)
-    result_name = args.result_name or f"result_deepspeed_{args.batch_size}_{args.epochs}.json"
+    result_name = args.result_name or f"result_deepspeed_{args.train_batch_size}_{args.epochs}.json"
     save_to_file(result_dict, result_name)

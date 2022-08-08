@@ -1,5 +1,5 @@
 {
-  "train_batch_size": 32,
+  "train_batch_size": 4,
   "steps_per_print": 10000,
   "optimizer": {
     "type": "SGD",
