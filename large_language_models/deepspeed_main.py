@@ -3,9 +3,42 @@ import time
 import deepspeed
 import torch
 import torch.utils.data
+from datasets import load_dataset
 from tqdm import tqdm
+from transformers import GPT2TokenizerFast
 
-from baseline_main import build_model, load_tokenized_dataset, save_to_file
+from baseline_main import build_model, save_to_file, get_batch
+
+
+def load_tokenized_dataset():
+    wiki_full_dataset = load_dataset("wikipedia", "20220301.en")
+    train_wiki_dataset = wiki_full_dataset["train"].shard(num_shards=800, index=0)
+    wiki_datasets = train_wiki_dataset.train_test_split(test_size=0.1)
+    tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
+
+    tokenized_datasets = wiki_datasets.map(lambda x: tokenizer(x['text']), batched=True)
+    train_dataset = GPT2Dataset(tokenized_datasets["train"])
+    test_dataset = GPT2Dataset(tokenized_datasets["test"])
+    return train_dataset, test_dataset
+
+
+class GPT2Dataset(torch.utils.data.Dataset):
+    def __init__(self, hf_data):
+        super().__init__()
+        self._data = []
+        for tokens in hf_data["input_ids"]:
+            batch = get_batch(tokens)
+            if batch is not None:
+                self._data.extend(batch)
+
+    def __len__(self):
+        return len(self._data)
+
+    def __getitem__(self, item):
+        input_tensor, output_tensor = self._data[item]
+        if torch.cuda.is_available():
+            input_tensor, output_tensor = input_tensor, output_tensor
+        return {"input_ids": input_tensor, "lm_labels": output_tensor}
 
 
 def train_model(args):
@@ -13,8 +46,6 @@ def train_model(args):
     train_ds, test_ds = load_tokenized_dataset()
     # train_dl = torch.utils.data.DataLoader(train_ds, batch_size=batch_size)
     test_dl = torch.utils.data.DataLoader(test_ds, batch_size=args.test_batch_size)
-    if torch.cuda.is_available():
-        model.cuda()
     model_engine, optimizer, train_dl, __ = deepspeed.initialize(
         args=args,
         model=model,
@@ -29,6 +60,7 @@ def train_model(args):
         print(f"Running epoch {epoch + 1}/{args.epochs}")
         st = time.time()
         for data in tqdm(train_dl):
+            data = {k: v.to(model_engine.local_rank) for k, v in data.items()}
             loss = model_engine(**data)
             if args.track_training:
                 losses.append(float(loss.cpu().detach().numpy()))
@@ -39,6 +71,7 @@ def train_model(args):
         model_engine.eval()
         print(f"Running test for epoch {epoch + 1}/{args.epochs}")
         for test_data in tqdm(test_dl):
+            test_data = {k: v.to(model_engine.local_rank) for k, v in test_data.items()}
             with torch.no_grad():
                 loss = model_engine(**test_data)
                 test_loss += float(loss.cpu().numpy())
