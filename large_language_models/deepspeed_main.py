@@ -79,7 +79,7 @@ if __name__ == "__main__":
                         help="Batch size to be used for test.")
     parser.add_argument("--track_training",
                         "-tt",
-                        action="return_true",
+                        action="store_true",
                         help="Track loss also while training.")
     parser.add_argument("--result_name",
                         type=str,

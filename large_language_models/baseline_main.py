@@ -126,7 +126,7 @@ if __name__ == "__main__":
     parser.add_argument("--test_batch_size", "-tbs", type=int, help="Batch size to be used for test.")
     parser.add_argument("--epochs", "-e", type=int, help="Number of epochs.")
     parser.add_argument("--learning_rate", "-lr", type=float, help="The learning rate.")
-    parser.add_argument("--track_training", "-tt", action="return_true", help="Track loss also while training.")
+    parser.add_argument("--track_training", "-tt", action="store_true", help="Track loss also while training.")
     parser.add_argument("--result_name", type=str, help="Filename where the result dictionary will be stored.")
     args = parser.parse_args()
     bs = args.batch_size or 1
