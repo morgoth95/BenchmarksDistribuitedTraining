@@ -13,6 +13,8 @@ def train_model(args):
     train_ds, test_ds = load_tokenized_dataset()
     # train_dl = torch.utils.data.DataLoader(train_ds, batch_size=batch_size)
     test_dl = torch.utils.data.DataLoader(test_ds, batch_size=args.test_batch_size)
+    if torch.cuda.is_available():
+        model.cuda()
     model_engine, optimizer, train_dl, __ = deepspeed.initialize(
         args=args,
         model=model,
