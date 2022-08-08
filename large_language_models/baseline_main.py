@@ -13,7 +13,7 @@ from tqdm import tqdm
 def add_model_path():
     here = Path(__file__).parent
     working_dir = here / "gpt-2-Pytorch/GPT2"
-    sys.path.append(working_dir)
+    sys.path.append(str(working_dir))
 
 
 def load_tokenized_dataset():
@@ -71,6 +71,8 @@ class GPT2Dataset(torch.utils.data.Dataset):
 
 def train_model(max_epochs: int, lr: float, batch_size: int, test_batch_size: int, track_training_metrics: bool):
     model = build_model()
+    if torch.cuda.is_available():
+        model.cuda()
     train_ds, test_ds = load_tokenized_dataset()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     train_dl = torch.utils.data.DataLoader(train_ds, batch_size=batch_size)
