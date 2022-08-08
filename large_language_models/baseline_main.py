@@ -1,5 +1,5 @@
 import json
-import os
+import sys
 import time
 from pathlib import Path
 
@@ -10,10 +10,10 @@ from transformers import GPT2TokenizerFast
 from tqdm import tqdm
 
 
-def change_working_directory():
+def add_model_path():
     here = Path(__file__).parent
     working_dir = here / "gpt-2-Pytorch/GPT2"
-    os.chdir(working_dir)
+    sys.path.append(working_dir)
 
 
 def load_tokenized_dataset():
