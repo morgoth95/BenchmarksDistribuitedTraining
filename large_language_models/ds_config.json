@@ -2,7 +2,7 @@
   "train_batch_size": 32,
   "steps_per_print": 10000,
   "optimizer": {
-    "type": "Adam",
+    "type": "SGD",
     "params": {
       "lr": 0.001,
       "momentum": 0.9,

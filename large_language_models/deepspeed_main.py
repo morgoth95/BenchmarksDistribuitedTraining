@@ -45,7 +45,7 @@ def train_model(args):
     model = build_model()
     train_ds, test_ds = load_tokenized_dataset()
     # train_dl = torch.utils.data.DataLoader(train_ds, batch_size=batch_size)
-    test_dl = torch.utils.data.DataLoader(test_ds, batch_size=args.test_batch_size)
+    test_dl = torch.utils.data.DataLoader(test_ds, batch_size=args.batch_size)
     model_engine, optimizer, train_dl, __ = deepspeed.initialize(
         args=args,
         model=model,
@@ -107,11 +107,6 @@ if __name__ == "__main__":
                         type=int,
                         default=-1,
                         help='local rank passed from distributed launcher')
-    parser.add_argument("--test_batch_size",
-                        "-tbs",
-                        default=32,
-                        type=int,
-                        help="Batch size to be used for test.")
     parser.add_argument("--track_training",
                         "-tt",
                         action="store_true",
