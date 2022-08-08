@@ -29,7 +29,7 @@ def load_tokenized_dataset():
 
 
 def build_model():
-    change_working_directory()
+    add_model_path()
     from config import GPT2Config
     from model import GPT2LMHeadModel
 
