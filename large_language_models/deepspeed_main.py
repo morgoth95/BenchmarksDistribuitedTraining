@@ -59,8 +59,8 @@ def train_model(args):
         training_data=train_ds,
     )
 
-    losses = []
-    test_losses = []
+    # losses = []
+    # test_losses = []
     time_per_epoch = []
     for epoch in range(args.epochs):
         print(f"Running epoch {epoch + 1}/{args.epochs}")
@@ -68,8 +68,8 @@ def train_model(args):
         for data in tqdm(train_dl):
             data = {k: v.to(model_engine.local_rank) for k, v in data.items()}
             loss = model_engine(**data)
-            if args.track_training:
-                losses.append(float(loss.cpu().detach().numpy()))
+            # if args.track_training:
+            #     losses.append(float(loss.cpu().detach().numpy()))
             model_engine.backward(loss)
             model_engine.step()
 
@@ -87,12 +87,12 @@ def train_model(args):
 
     total_time = sum(time_per_epoch)
     return_dict = {
-        "test": test_losses,
+    #    "test": test_losses,
         "total_time": total_time,
         "time_per_epoch": time_per_epoch,
     }
-    if args.track_training:
-        return_dict["train"] = losses
+    # if args.track_training:
+    #     return_dict["train"] = losses
     return return_dict
 
 
