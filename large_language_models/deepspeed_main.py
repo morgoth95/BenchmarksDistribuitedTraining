@@ -72,6 +72,7 @@ def train_model(args):
             #     losses.append(float(loss.cpu().detach().numpy()))
             model_engine.backward(loss)
             model_engine.step()
+        print(f"Finished epoch {epoch+1}/{epoch}")
 
         # test_loss = 0
         # model_engine.eval()
@@ -86,6 +87,7 @@ def train_model(args):
         time_per_epoch.append(time.time() - st)
 
     total_time = sum(time_per_epoch)
+    print(f"Total time: {total_time}")
     return_dict = {
     #    "test": test_losses,
         "total_time": total_time,
