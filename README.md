@@ -7,10 +7,10 @@
 
 ## Deepspeed
 - Run on multiple gpus:
-> deepspeed --hostfile=hostfile train.py --deepspeed_config ds_config.json --epochs=1 --batch_size 64
+> deepspeed --hostfile=hostfile train.py --deepspeed_config ds_config.json --epochs=1
 
 - Run on single gpu:
-> deepspeed train.py --deepspeed_config ds_config.json --epochs=1 --batch_size 64
+> deepspeed train.py --deepspeed_config ds_config.json --epochs=1
 
 ## Colossal AI
 - Run on multiple gpus:

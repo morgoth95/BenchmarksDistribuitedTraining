@@ -1,0 +1,1 @@
+deepspeed --hostfile=hostfile train.py --deepspeed_config ds_config_zero.json --epochs=1 --models="vit_h_14" --limit_data=500
