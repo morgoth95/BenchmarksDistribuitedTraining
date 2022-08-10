@@ -8,6 +8,7 @@ from colossalai.logging import get_dist_logger
 import torch
 from colossalai.core import global_context as gpc
 from colossalai.utils import get_dataloader
+from colossalai.zero.init_ctx import ZeroInitContext
 from torchvision import transforms
 from colossalai.nn.lr_scheduler import CosineAnnealingLR
 from torchvision.datasets import CIFAR10
@@ -93,8 +94,10 @@ criterion = torch.nn.CrossEntropyLoss()
 result = {}
 models = [supported_models[key] for key in model_list]
 for model in models:
-    model = model(num_classes=10)
-
+    with ZeroInitContext(target_device=torch.cuda.current_device(),
+                         shard_strategy=gpc.config.zero.model_config.shard_strategy,
+                         shard_param=True):
+        model = model(num_classes=10)
     # optimizer
     optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
 
@@ -141,5 +144,5 @@ for model in models:
 
     result[str(model.__class__.__name__)] = (stop - start)
 
-with open(f"result_colossalai_{gpc.config.BATCH_SIZE}.json", "w") as fp:
+with open(f"result_colossalai_{gpc.config.BATCH_SIZE}_{args.name}.json", "w") as fp:
     json.dump(result, fp)
