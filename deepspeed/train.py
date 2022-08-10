@@ -70,11 +70,11 @@ if torch.distributed.get_rank() == 0:
     # cifar data is downloaded, indicate other ranks can proceed
     torch.distributed.barrier()
 
-with open("ds_config.json", "r") as fp:
+with open(args.deepspeed_config, "r") as fp:
     config = json.load(fp)
 
 batch_size = config["train_batch_size"]
-models = [supported_models[key] for key in args.models]
+models = [supported_models[key] for key in model_list]
 
 result = {}
 for model in models:
