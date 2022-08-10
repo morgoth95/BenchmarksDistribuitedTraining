@@ -51,7 +51,7 @@ def train_model(args):
         # cifar data is downloaded, indicate other ranks can proceed
         torch.distributed.barrier()
     # train_dl = torch.utils.data.DataLoader(train_ds, batch_size=batch_size)
-    test_dl = torch.utils.data.DataLoader(test_ds, batch_size=args.batch_size)
+    # test_dl = torch.utils.data.DataLoader(test_ds, batch_size=args.batch_size)
     model_engine, optimizer, train_dl, __ = deepspeed.initialize(
         args=args,
         model=model,
@@ -73,16 +73,16 @@ def train_model(args):
             model_engine.backward(loss)
             model_engine.step()
 
-        test_loss = 0
-        model_engine.eval()
-        print(f"Running test for epoch {epoch + 1}/{args.epochs}")
-        for test_data in tqdm(test_dl):
-            test_data = {k: v.to(model_engine.local_rank) for k, v in test_data.items()}
-            with torch.no_grad():
-                loss = model_engine(**test_data)
-                test_loss += float(loss.cpu().numpy())
-        if len(test_dl) > 0:
-            test_losses.append(test_loss / len(test_dl))
+        # test_loss = 0
+        # model_engine.eval()
+        # print(f"Running test for epoch {epoch + 1}/{args.epochs}")
+        # for test_data in tqdm(test_dl):
+        #     test_data = {k: v.to(model_engine.local_rank) for k, v in test_data.items()}
+        #     with torch.no_grad():
+        #         loss = model_engine(**test_data)
+        #         test_loss += float(loss.cpu().numpy())
+        # if len(test_dl) > 0:
+        #     test_losses.append(test_loss / len(test_dl))
         time_per_epoch.append(time.time() - st)
 
     total_time = sum(time_per_epoch)
