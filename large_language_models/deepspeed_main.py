@@ -43,7 +43,13 @@ class GPT2Dataset(torch.utils.data.Dataset):
 
 def train_model(args):
     model = build_model()
+    if torch.distributed.get_rank() != 0:
+        # might be downloading cifar data, let rank 0 download first
+        torch.distributed.barrier()
     train_ds, test_ds = load_tokenized_dataset()
+    if torch.distributed.get_rank() == 0:
+        # cifar data is downloaded, indicate other ranks can proceed
+        torch.distributed.barrier()
     # train_dl = torch.utils.data.DataLoader(train_ds, batch_size=batch_size)
     test_dl = torch.utils.data.DataLoader(test_ds, batch_size=args.batch_size)
     model_engine, optimizer, train_dl, __ = deepspeed.initialize(
@@ -118,9 +124,6 @@ if __name__ == "__main__":
     parser = deepspeed.add_config_arguments(parser)
     args = parser.parse_args()
     deepspeed.init_distributed()
-    if torch.distributed.get_rank() != 0:
-        # might be downloading cifar data, let rank 0 download first
-        torch.distributed.barrier()
 
     result_dict = train_model(args)
     result_name = args.result_name or f"result_deepspeed_{args.train_batch_size}_{args.epochs}.json"
