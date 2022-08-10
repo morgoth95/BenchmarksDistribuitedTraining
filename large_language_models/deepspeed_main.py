@@ -95,7 +95,7 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument('-bs',
                         '--batch_size',
-                        default=32,
+                        default=1,
                         type=int,
                         help='mini-batch size (default: 32)')
     parser.add_argument('-e',
