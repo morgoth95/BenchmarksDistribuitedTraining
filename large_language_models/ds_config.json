@@ -1,6 +1,7 @@
 {
   "train_batch_size": 8,
   "steps_per_print": 10000,
+  "dataloader_drop_last": true,
   "optimizer": {
     "type": "Adam",
     "params": {
