@@ -65,10 +65,12 @@ def train_model(args):
     # losses = []
     # test_losses = []
     time_per_epoch = []
+    print(f"Length dataloder: {len(train_dl)}")
     for epoch in range(args.epochs):
         print(f"Running epoch {epoch + 1}/{args.epochs}")
         st = time.time()
-        for data in tqdm(train_dl):
+        for i, data in tqdm(enumerate(train_dl)):
+            print(f"batch: {i}")
             data = {k: v.to(model_engine.local_rank) for k, v in data.items()}
             loss = model_engine(**data)
             # if args.track_training:
