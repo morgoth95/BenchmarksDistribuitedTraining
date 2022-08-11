@@ -19,6 +19,8 @@ def load_tokenized_dataset():
     tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
 
     tokenized_datasets = wiki_datasets.map(lambda x: tokenizer(x['text']), batched=True)
+    print("###########################################")
+    print(len(tokenized_datasets["train"]))
     train_dataset = GPT2Dataset(tokenized_datasets["train"])
     test_dataset = GPT2Dataset(tokenized_datasets["test"])
     return train_dataset, test_dataset
@@ -49,6 +51,8 @@ def train_model(args):
     #     # might be downloading cifar data, let rank 0 download first
     #     torch.distributed.barrier()
     train_ds, test_ds = load_tokenized_dataset()
+    print("#############################################")
+    print(len(train_ds))
     torch.distributed.barrier()
     #if torch.distributed.get_rank() == 0:
     #    # cifar data is downloaded, indicate other ranks can proceed
@@ -78,7 +82,7 @@ def train_model(args):
             model_engine.backward(loss)
             model_engine.step()
             torch.distributed.barrier()
-        print(f"Finished epoch {epoch+1}/{epoch}")
+        print(f"Finished epoch {epoch+1}/{args.epochs}")
         # test_loss = 0
         # model_engine.eval()
         # print(f"Running test for epoch {epoch + 1}/{args.epochs}")
