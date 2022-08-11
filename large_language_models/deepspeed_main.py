@@ -75,9 +75,8 @@ def train_model(args):
             #     losses.append(float(loss.cpu().detach().numpy()))
             model_engine.backward(loss)
             model_engine.step()
+            torch.distributed.barrier()
         print(f"Finished epoch {epoch+1}/{epoch}")
-        torch.distributed.barrier()
-
         # test_loss = 0
         # model_engine.eval()
         # print(f"Running test for epoch {epoch + 1}/{args.epochs}")
@@ -89,6 +88,7 @@ def train_model(args):
         # if len(test_dl) > 0:
         #     test_losses.append(test_loss / len(test_dl))
         time_per_epoch.append(time.time() - st)
+        torch.distributed.barrier()
 
     total_time = sum(time_per_epoch)
     print(f"Total time: {total_time}")
