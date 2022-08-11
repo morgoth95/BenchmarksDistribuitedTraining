@@ -19,8 +19,6 @@ def load_tokenized_dataset():
     tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
 
     tokenized_datasets = wiki_datasets.map(lambda x: tokenizer(x['text']), batched=True)
-    print("###########################################")
-    print(len(tokenized_datasets["train"]))
     train_dataset = GPT2Dataset(tokenized_datasets["train"])
     test_dataset = GPT2Dataset(tokenized_datasets["test"])
     return train_dataset, test_dataset
@@ -47,18 +45,11 @@ class GPT2Dataset(torch.utils.data.Dataset):
 
 def train_model(args):
     model = build_model()
-    # if torch.distributed.get_rank() != 0:
-    #     # might be downloading cifar data, let rank 0 download first
-    #     torch.distributed.barrier()
+
     train_ds, test_ds = load_tokenized_dataset()
-    print("#############################################")
-    print(len(train_ds))
     torch.distributed.barrier()
-    #if torch.distributed.get_rank() == 0:
-    #    # cifar data is downloaded, indicate other ranks can proceed
-    #    torch.distributed.barrier()
-    # train_dl = torch.utils.data.DataLoader(train_ds, batch_size=batch_size)
-    # test_dl = torch.utils.data.DataLoader(test_ds, batch_size=args.batch_size)
+
+    test_dl = torch.utils.data.DataLoader(test_ds, batch_size=args.batch_size)
     model_engine, optimizer, train_dl, __ = deepspeed.initialize(
         args=args,
         model=model,
@@ -66,45 +57,43 @@ def train_model(args):
         training_data=train_ds,
     )
 
-    # losses = []
-    # test_losses = []
+    losses = []
+    test_losses = []
     time_per_epoch = []
-    print(f"Length dataloder: {len(train_dl)}")
     for epoch in range(args.epochs):
         print(f"Running epoch {epoch + 1}/{args.epochs}")
         st = time.time()
         for i, data in tqdm(enumerate(train_dl)):
-            print(f"batch: {i}")
             data = {k: v.to(model_engine.local_rank) for k, v in data.items()}
             loss = model_engine(**data)
-            # if args.track_training:
-            #     losses.append(float(loss.cpu().detach().numpy()))
+            if args.track_training:
+                losses.append(float(loss.cpu().detach().numpy()))
             model_engine.backward(loss)
             model_engine.step()
-            torch.distributed.barrier()
+        torch.distributed.barrier()
         print(f"Finished epoch {epoch+1}/{args.epochs}")
-        # test_loss = 0
-        # model_engine.eval()
-        # print(f"Running test for epoch {epoch + 1}/{args.epochs}")
-        # for test_data in tqdm(test_dl):
-        #     test_data = {k: v.to(model_engine.local_rank) for k, v in test_data.items()}
-        #     with torch.no_grad():
-        #         loss = model_engine(**test_data)
-        #         test_loss += float(loss.cpu().numpy())
-        # if len(test_dl) > 0:
-        #     test_losses.append(test_loss / len(test_dl))
+        test_loss = 0
+        model_engine.eval()
+        print(f"Running test for epoch {epoch + 1}/{args.epochs}")
+        for test_data in tqdm(test_dl):
+            test_data = {k: v.to(model_engine.local_rank) for k, v in test_data.items()}
+            with torch.no_grad():
+                loss = model_engine(**test_data)
+                test_loss += float(loss.cpu().numpy())
+        if len(test_dl) > 0:
+            test_losses.append(test_loss / len(test_dl))
         time_per_epoch.append(time.time() - st)
         torch.distributed.barrier()
 
     total_time = sum(time_per_epoch)
     print(f"Total time: {total_time}")
     return_dict = {
-    #    "test": test_losses,
+        "test": test_losses,
         "total_time": total_time,
         "time_per_epoch": time_per_epoch,
     }
-    # if args.track_training:
-    #     return_dict["train"] = losses
+    if args.track_training:
+        return_dict["train"] = losses
     return return_dict
 
 
@@ -115,12 +104,12 @@ if __name__ == "__main__":
                         '--batch_size',
                         default=1,
                         type=int,
-                        help='mini-batch size (default: 32)')
+                        help='mini-batch size (default: 1)')
     parser.add_argument('-e',
                         '--epochs',
                         default=10,
                         type=int,
-                        help='number of total epochs (default: 30)')
+                        help='number of total epochs (default: 10)')
     parser.add_argument('--local_rank',
                         type=int,
                         default=-1,
