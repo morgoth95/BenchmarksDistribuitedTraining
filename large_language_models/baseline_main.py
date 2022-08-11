@@ -19,7 +19,7 @@ def add_model_path():
 def load_tokenized_dataset():
     wiki_full_dataset = load_dataset("wikipedia", "20220301.en")
     train_wiki_dataset = wiki_full_dataset["train"].shard(num_shards=800, index=0)
-    wiki_datasets = train_wiki_dataset.train_test_split(test_size=0.1)
+    wiki_datasets = train_wiki_dataset.train_test_split(test_size=0.1, shuffle=False)
     tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
 
     tokenized_datasets = wiki_datasets.map(lambda x: tokenizer(x['text']), batched=True)

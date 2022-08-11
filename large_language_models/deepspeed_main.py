@@ -56,6 +56,8 @@ def train_model(args):
         model_parameters=model.parameters(),
         training_data=train_ds,
     )
+    print("##########################################")
+    print(f"training set: {len(train_dl)}. Test set {len(test_dl)}")
 
     losses = []
     test_losses = []
