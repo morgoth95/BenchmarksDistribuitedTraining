@@ -1,11 +1,17 @@
 {
-  "train_batch_size": 32,
+  "train_batch_size": 40,
   "steps_per_print": 10000,
   "dataloader_drop_last": true,
   "optimizer": {
-    "type": "Lamb",
+    "type": "Adam",
     "params": {
-      "lr": 11e-3
+      "lr": 0.001,
+      "betas": [
+        0.8,
+        0.999
+      ],
+      "eps": 1e-8,
+      "weight_decay": 3e-7
     }
   },
   "fp16": {
@@ -33,6 +39,7 @@
       "device": "cpu"
     }
   },
+  "gradient_clipping": 1.0,
   "scheduler": {
     "type": "WarmupLR",
     "params": {
@@ -41,7 +48,6 @@
       "warmup_num_steps": 1000
     }
   },
-  "wall_clock_breakdown": false,
-  "zero_allow_untested_optimizer": true
+  "wall_clock_breakdown": false
 }
 
