@@ -3,15 +3,18 @@
   "steps_per_print": 10000,
   "dataloader_drop_last": true,
   "optimizer": {
-    "type": "Adam",
+    "type": "OneBitLamb",
     "params": {
-      "lr": 0.001,
-      "betas": [
-        0.8,
-        0.999
-      ],
-      "eps": 1e-8,
-      "weight_decay": 3e-7
+      "lr": 11e-3,
+      "max_coeff": 0.3,
+      "min_coeff": 0.01,
+      "freeze_step": 1000,
+      "cuda_aware": false,
+      "comm_backend_name": "nccl",
+      "coeff_beta": 0.9,
+      "factor_max": 4.0,
+      "factor_min": 0.5,
+      "factor_threshold": 0.1
     }
   },
   "fp16": {
