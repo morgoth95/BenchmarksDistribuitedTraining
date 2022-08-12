@@ -1,5 +1,5 @@
 {
-  "train_batch_size": 32,
+  "train_batch_size": 16,
   "steps_per_print": 10000,
   "dataloader_drop_last": true,
   "optimizer": {
@@ -15,15 +15,6 @@
       "cuda_aware": false,
       "comm_backend_name": "nccl"
     }
-  },
-  "fp16": {
-    "enabled": true,
-    "auto_cast": true,
-    "loss_scale": 0,
-    "initial_scale_power": 32,
-    "loss_scale_window": 1000,
-    "hysteresis": 2,
-    "min_loss_scale": 1
   },
   "scheduler": {
     "type": "WarmupLR",
