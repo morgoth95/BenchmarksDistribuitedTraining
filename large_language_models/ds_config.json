@@ -1,5 +1,5 @@
 {
-  "train_batch_size": 36,
+  "train_batch_size": 48,
   "steps_per_print": 10000,
   "dataloader_drop_last": true,
   "optimizer": {
