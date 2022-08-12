@@ -65,6 +65,7 @@ def train_model(args):
     for epoch in range(args.epochs):
         print(f"Running epoch {epoch + 1}/{args.epochs}")
         st = time.time()
+        model_engine.train()
         for i, data in tqdm(enumerate(train_dl)):
             data = {k: v.to(model_engine.local_rank) for k, v in data.items()}
             loss = model_engine(**data)
