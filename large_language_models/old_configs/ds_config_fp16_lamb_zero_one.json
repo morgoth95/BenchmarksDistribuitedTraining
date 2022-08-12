@@ -3,9 +3,18 @@
   "steps_per_print": 10000,
   "dataloader_drop_last": true,
   "optimizer": {
-    "type": "Lamb",
+    "type": "OneBitLamb",
     "params": {
-      "lr": 11e-3
+      "lr": 11e-3,
+      "max_coeff": 0.3,
+      "min_coeff": 0.01,
+      "freeze_step": 1000,
+      "cuda_aware": false,
+      "comm_backend_name": "nccl",
+      "coeff_beta": 0.9,
+      "factor_max": 4.0,
+      "factor_min": 0.5,
+      "factor_threshold": 0.1
     }
   },
   "fp16": {
@@ -16,22 +25,6 @@
     "loss_scale_window": 1000,
     "hysteresis": 2,
     "min_loss_scale": 1
-  },
-  "zero_optimization": {
-    "stage": 3,
-    "contiguous_gradients": true,
-    "stage3_max_live_parameters": 1e9,
-    "stage3_max_reuse_distance": 1e9,
-    "stage3_prefetch_bucket_size": 1e7,
-    "stage3_param_persistence_threshold": 1e5,
-    "reduce_bucket_size": 1e7,
-    "sub_group_size": 1e9,
-    "offload_optimizer": {
-      "device": "cpu"
-    },
-    "offload_param": {
-      "device": "cpu"
-    }
   },
   "scheduler": {
     "type": "WarmupLR",
