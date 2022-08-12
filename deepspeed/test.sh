@@ -1,0 +1,1 @@
+deepspeed --hostfile=hostfile train.py --deepspeed_config ds_config.json --epochs=1 --models="swin_b" --limit_data=6000 --name swin_b_fp16 --find_bs
