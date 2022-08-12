@@ -5,3 +5,4 @@ install_prerequisites:
 	cd gpt-2-Pytorch && pip3 install -r requirements.txt
 	pip3 install transformers
 	pip3 install datasets
+	pip3 install cupy
