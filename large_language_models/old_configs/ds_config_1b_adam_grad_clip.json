@@ -26,6 +26,7 @@
     "hysteresis": 2,
     "min_loss_scale": 1
   },
+  "gradient_clipping": 1.0,
   "scheduler": {
     "type": "WarmupLR",
     "params": {
