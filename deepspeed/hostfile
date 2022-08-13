@@ -1,2 +1,4 @@
-ip_host_1 slots=1
-ip_host_2 slots=1
+172.31.4.100 slots=1
+172.31.82.223 slots=1
+172.31.15.188 slots=1
+172.31.88.120 slots=1
